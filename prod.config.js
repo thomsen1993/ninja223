@@ -1,36 +1,48 @@
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
+//const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+//const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 const webpack = require('webpack');
+const CopyPlugin = require("copy-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+
 
 module.exports = {
     mode: 'production',
     watch: true,
 
 
+    optimization: {
+      minimize: true,
+      minimizer: [new TerserPlugin()],
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            compress: {
+              drop_console: true
+            }
+          }
+        })
+      ]
+    },
+
+
     plugins: [
+        
         new webpack.ProvidePlugin({
             PIXI: 'pixi.js'
           }),
-    
-        new UglifyJsPlugin({
+        
 
-            uglifyOptions: {
+        new CopyPlugin({
+            patterns: [
+              { from: "./assets", to: "./assets" },
+            
+            ],
+            options: {
+              concurrency: 100,
+            },
+          }),
 
-                compress: {
-                    drop_console: true
-                },
-                
-                output: {
-                    comments: false,
-                    beautify: false
-
-                }
-
-            }
-
-
-        }),
        
        /*
         new UnminifiedWebpackPlugin({
@@ -43,7 +55,7 @@ module.exports = {
 
 
 
-    entry: ["@babel/polyfill", "./src/app.js"],
+    entry: ["./src/app.js"],
     module: {
         rules: [
             {
